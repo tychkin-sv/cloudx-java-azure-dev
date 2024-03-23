@@ -24,6 +24,10 @@ management:
   endpoint:
     httptrace:
       enabled: true
+
+azure:
+  application-insights:
+    instrumentation-key: ${PETSTORESERVICES_AI_INSTRUMENTATION_KEY}
     
 data:
   pets:
