@@ -1,5 +1,7 @@
 package com.chtrembl.petstoreapp;
 
+import com.chtrembl.petstoreapp.exception.CustomException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -10,16 +12,16 @@ import java.net.UnknownHostException;
 
 @SpringBootApplication
 public class PetstoreappApplication {
-	private static Logger logger = LoggerFactory.getLogger(PetstoreappApplication.class);
+	private static final Logger logger = LoggerFactory.getLogger(PetstoreappApplication.class);
 
 	public static void main(String[] args) {
 		SpringApplication.run(PetstoreappApplication.class, args);
-		logger.info("PetStoreApp started up... " + System.getProperty("catalina.base"));
+		logger.info("PetStoreApp started up... {}", System.getProperty("catalina.base"));
 		try {
 			InetAddress address = InetAddress.getByName("www.google.com");
-			logger.info("GOOGLE: " + address.getHostAddress());
+			logger.info("GOOGLE: {}", address.getHostAddress());
 		} catch (UnknownHostException e) {
-			throw new RuntimeException(e);
+			throw new CustomException("Get address by name", e);
 		}
 	}
 }
