@@ -1,8 +1,6 @@
 package com.chtrembl.petstoreapp.controller;
 
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
+import com.chtrembl.petstoreapp.model.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -11,48 +9,50 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.chtrembl.petstoreapp.model.User;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * REST controller to facilitate REST calls such as session keep alives
  * (progressive web apps)
- *
  */
 @RestController
 public class RestAPIController {
 
-	@Autowired
-	private User sessionUser;
+    public static final String SESSION_ID = "session-id";
 
-	@GetMapping("/api/contactus")
-	public String contactus() {
+    @Autowired
+    private User sessionUser;
 
-		this.sessionUser.getTelemetryClient().trackEvent(
-				String.format("PetStoreApp user %s requesting Contact Us", this.sessionUser.getName()),
-				this.sessionUser.getCustomEventProperties(), null);
+    @GetMapping("/api/contactus")
+    public String contactus() {
 
-		return "Please contact Azure PetStore at 401-555-5555. Thank you. Demo 6/13";
-	}
+        this.sessionUser.getTelemetryClient().trackEvent(
+                String.format("PetStoreApp user %s requesting Contact Us", this.sessionUser.getName()),
+                this.sessionUser.getCustomEventProperties(), null);
 
-	@GetMapping("/api/sessionid")
-	public String sessionid() {
+        return "Please contact Azure PetStore at 401-555-5555. Thank you. Demo 6/13";
+    }
 
-		return this.sessionUser.getSessionId();
-	}
+    @GetMapping("/api/sessionid")
+    public String sessionid() {
 
-	@GetMapping(value = "/introspectionSimulation", produces = MediaType.APPLICATION_JSON_VALUE)
-	public String introspectionSimulation(Model model, HttpServletRequest request,
-			@RequestParam(name = "sessionIdToIntrospect") Optional<String> sessionIdToIntrospect) {
-		boolean active = (sessionIdToIntrospect != null && sessionIdToIntrospect.isPresent()
-				&& sessionIdToIntrospect.get() != null
-				&& sessionIdToIntrospect.get().equals(request.getHeader("session-id")));
+        return this.sessionUser.getSessionId();
+    }
 
-			return "{\n" + 
-				"  \"active\": " + active + ",\n" + 
-					"  \"scope\": \"read write email\",\n" + 
-					"  \"client_id\": \""+request.getHeader("session-id")+"\",\n" + 
-					"  \"username\": \""+request.getHeader("session-id")+"\",\n" + 
-					"  \"exp\": 1911221039\n" + 
-					"}";
-		}
+    @GetMapping(value = "/introspectionSimulation", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String introspectionSimulation(Model model, HttpServletRequest request,
+                                          @RequestParam(name = "sessionIdToIntrospect") Optional<String> sessionIdToIntrospect) {
+        boolean active = (sessionIdToIntrospect.isPresent()
+                && sessionIdToIntrospect.get().equals(request.getHeader(SESSION_ID)));
+
+        return "{\n" +
+                "  \"active\": " + active + ",\n" +
+                "  \"scope\": \"read write email\",\n" +
+                "  \"client_id\": \"" + request.getHeader(SESSION_ID) + "\",\n" +
+                "  \"username\": \"" + request.getHeader(SESSION_ID) + "\",\n" +
+                "  \"exp\": 1911221039\n" +
+                "}";
+    }
 }
