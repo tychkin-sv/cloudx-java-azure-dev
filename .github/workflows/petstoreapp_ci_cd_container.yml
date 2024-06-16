@@ -1,10 +1,10 @@
-name: Pet Store App CI/CD to Azure App Service
+name: Pet Store App CI/CD to Azure Container Registry
 
 env:
     AZURE_CONTAINER_REGISTRY: 22tsvacr.azurecr.io
     AZURE_CONTAINER_REGISTRY_USERNAME: 22tsvacr
     IMAGE_NAME: petstoreapp
-    IMAGE_TAG: v2
+    IMAGE_TAG: latest
 on:
     push:
         branches:
@@ -47,6 +47,5 @@ jobs:
 
             -   name: Build and push Docker image to Azure Container Registry
                 run: |
-                    docker build petstore/petstoreapp -t ${{env.AZURE_CONTAINER_REGISTRY}}/petstoreapp:latest -t ${{ env.AZURE_CONTAINER_REGISTRY }}/petstoreapp:${{ github.sha }}
-                    docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/petstoreapp:${{ github.sha }}
+                    docker build petstore/petstoreapp -t ${{env.AZURE_CONTAINER_REGISTRY}}/petstoreapp:${{ env.IMAGE_TAG }} 
                     docker push  ${{ env.AZURE_CONTAINER_REGISTRY }}/petstoreapp:${{ env.IMAGE_TAG }}
