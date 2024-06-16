@@ -1,5 +1,5 @@
 # Function to create an Azure App Service Plan
-# petstore/bin/appserviceplan.sh
+# Usage ./bin/appserviceplan.sh
 function create_app_service_plan() {
     local plan_name=$1
     local rg_name=$2
@@ -12,7 +12,6 @@ function create_app_service_plan() {
       --location "$location" \
       --sku P1V2 \
       --is-linux \
-      --tags "Project=tsv" \
       --output none
 }
 
