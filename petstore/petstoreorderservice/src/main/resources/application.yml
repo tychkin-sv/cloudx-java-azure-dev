@@ -32,4 +32,4 @@ management:
 
 azure:
   application-insights:
-    instrumentation-key: ${PETSTORESERVICES_AI_INSTRUMENTATION_KEY}
+    instrumentation-key: ${PETSTORESERVICES_AI_INSTRUMENTATION_KEY:}
