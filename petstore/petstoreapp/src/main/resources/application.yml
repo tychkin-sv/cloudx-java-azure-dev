@@ -42,4 +42,4 @@ spring:
 
 azure:
     application-insights:
-        instrumentation-key: ${PETSTOREAPP_AI_INSTRUMENTATION_KEY}
+        instrumentation-key: ${PETSTOREAPP_AI_INSTRUMENTATION_KEY:}
