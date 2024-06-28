@@ -2,7 +2,7 @@
 # Usage: ./bin/acr_app.sh
 
 az acr build \
---image petstoreapp:old \
+--image petstoreapp:latest \
 --registry 22tsvacr \
 --file ../petstoreapp/Dockerfile \
 ../petstoreapp/
