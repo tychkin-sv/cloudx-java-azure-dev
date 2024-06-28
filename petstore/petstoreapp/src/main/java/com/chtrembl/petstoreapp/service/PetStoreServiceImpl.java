@@ -122,75 +122,8 @@ public class PetStoreServiceImpl implements PetStoreService {
     }
 
     @Override
-    public Collection<Product> getProducts(String category, List<Tag> tags) {
-        List<Product> products = new ArrayList<>();
-
-        try {
-            Consumer<HttpHeaders> consumer = it -> it.addAll(this.webRequest.getHeaders());
-            products = this.productServiceWebClient.get()
-                    .uri("petstoreproductservice/v2/product/findByStatus?status=available")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .headers(consumer)
-                    .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                    .header("Cache-Control", "no-cache")
-                    .retrieve()
-                    .bodyToMono(new ParameterizedTypeReference<List<Product>>() {
-                    }).block();
-
-
-            if (Objects.nonNull(products)) {
-                // filter this specific request per category
-                if (tags.stream().anyMatch(t -> t.getName().equals("large"))) {
-                    products = products.stream().filter(product -> category.equals(product.getCategory().getName())
-                            && product.getTags().toString().contains("large")).collect(Collectors.toList());
-                } else {
-
-                    products = products.stream().filter(product -> category.equals(product.getCategory().getName())
-                            && product.getTags().toString().contains("small")).collect(Collectors.toList());
-                }
-                logger.info(String.format("User: %s", this.sessionUser.getName()));
-                logger.info(String.format("SessionId: %s", this.sessionUser.getSessionId()));
-                logger.info(String.format("Product Count: %s", products.size()));
-
-                this.sessionUser.getTelemetryClient().trackEvent(
-                        String.format("PetStoreApp user %s", this.sessionUser.getName()),
-                        this.sessionUser.getCustomEventProperties(), null);
-                this.sessionUser.getTelemetryClient().trackEvent(
-                        String.format("PetStoreApp sessionId %s", this.sessionUser.getSessionId()),
-                        this.sessionUser.getCustomEventProperties(), null);
-                this.sessionUser.getTelemetryClient().trackMetric("PetStoreApp.Product.Count", products.size());
-                return products;
-            } else {
-                products = Collections.EMPTY_LIST;
-            }
-            // use this for look up on details page, intentionally avoiding spring cache to
-            // ensure service calls are made each for each browser session
-            // to show Telemetry with APIM requests (normally this would be cached in a real
-            // world production scenario)
-            this.sessionUser.setProducts(products);
-            return products;
-        } catch (WebClientException wce) {
-            // little hack to visually show the error message within our Azure Pet Store
-            // Reference Guide (Academic Tutorial)
-            Product product = new Product();
-            product.setName(wce.getMessage());
-            product.setPhotoURL("");
-            product.setCategory(new Category());
-            product.setId((long) 0);
-            products.add(product);
-        } catch (IllegalArgumentException iae) {
-            // little hack to visually show the error message within our Azure Pet Store
-            // Reference Guide (Academic Tutorial)
-            Product product = new Product();
-            product.setName(
-                    "petstore.service.url:${PETSTOREPRODUCTSERVICE_URL} needs to be enabled for this service to work"
-                            + iae.getMessage());
-            product.setPhotoURL("");
-            product.setCategory(new Category());
-            product.setId((long) 0);
-            products.add(product);
-        }
-        return products;
+    public Collection<Product> getProducts(String category, List<Tag> tags) throws Exception {
+        throw new Exception("Cannot move further");
     }
 
     @Override
