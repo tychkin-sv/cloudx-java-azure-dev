@@ -82,3 +82,8 @@ After the services are up and running, you can access the PetStore application a
     - ProductService: [http://localhost:8082/swagger-ui/](http://localhost:8082/swagger-ui/)
     - OrderService: [http://localhost:8083/swagger-ui/](http://localhost:8083/swagger-ui/)
 
+
+# Local storage testing
+## Run Azurite
+azurite --silent --location c:\azurite --debug c:\azurite\debug.log
+## Create container

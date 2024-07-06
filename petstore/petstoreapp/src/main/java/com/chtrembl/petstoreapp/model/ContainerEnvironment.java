@@ -1,10 +1,7 @@
 package com.chtrembl.petstoreapp.model;
 
-import ch.qos.logback.core.joran.spi.JoranException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -33,6 +27,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.crypto.spec.SecretKeySpec;
+
+import ch.qos.logback.core.joran.spi.JoranException;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import reactor.core.publisher.Mono;
+
 /**
  * Singleton to store container state
  */
@@ -40,239 +43,246 @@ import java.util.List;
 @Component
 @EnableScheduling
 public class ContainerEnvironment implements Serializable {
-	private static Logger logger = LoggerFactory.getLogger(ContainerEnvironment.class);
-	private String containerHostName = null;
-	private String appVersion = null;
-	private String appDate = null;
-	private String year = null;
+    private static final Logger logger = LoggerFactory.getLogger(ContainerEnvironment.class);
+    private String containerHostName = null;
+    private String appVersion = null;
+    private String appDate = null;
+    private String year = null;
 
-	private boolean securityEnabled = false;
+    private boolean securityEnabled = false;
 
-	@Value("${petstore.service.pet.url:}")
-	private String petStorePetServiceURL;
+    @Value("${petstore.service.pet.url:}")
+    private String petStorePetServiceURL;
 
-	@Value("${petstore.service.product.url:}")
-	private String petStoreProductServiceURL;
+    @Value("${petstore.service.product.url:}")
+    private String petStoreProductServiceURL;
 
-	@Value("${petstore.service.order.url:}")
-	private String petStoreOrderServiceURL;
+    @Value("${petstore.service.order.url:}")
+    private String petStoreOrderServiceURL;
 
-	@Value("${petstore.service.subscription.key:}")
-	private String petStoreServicesSubscriptionKey;
+    @Value("${petstore.function.orderitemsreserver.url:}")
+    private String orderItemsReserverURL;
 
-	@Value("${petstore.apim.host:}")
-	private String petstoreAPIMHost;
+    @Value("${petstore.service.subscription.key:}")
+    private String petStoreServicesSubscriptionKey;
 
-	@Value("${ga.tracking.id:}")
-	private String gaTrackingId;
+    @Value("${petstore.apim.host:}")
+    private String petstoreAPIMHost;
 
-	@Value("${bing.search.url:https://api.bing.microsoft.com/}")
-	private String bingSearchURL;
+    @Value("${ga.tracking.id:}")
+    private String gaTrackingId;
 
-	@Value("${bing.search.subscription.key:}")
-	private String bingSearchSubscriptionKey;
+    @Value("${bing.search.url:https://api.bing.microsoft.com/}")
+    private String bingSearchURL;
 
-	@Value("#{T(java.util.Arrays).asList('${petstore.logging.additional-headers-to-log:}')}") 
-	private List<String> additionalHeadersToLog;
+    @Value("${bing.search.subscription.key:}")
+    private String bingSearchSubscriptionKey;
 
-	@Value("#{T(java.util.Arrays).asList('${petstore.logging.additional-headers-to-send:}')}") 
-	private List<String> additionalHeadersToSend;
+    @Value("#{T(java.util.Arrays).asList('${petstore.logging.additional-headers-to-log:}')}")
+    private List<String> additionalHeadersToLog;
 
-	@Value("${petstore.signalr.negotiation-url:}")
-	private String signalRNegotiationURL;
+    @Value("#{T(java.util.Arrays).asList('${petstore.logging.additional-headers-to-send:}')}")
+    private List<String> additionalHeadersToSend;
 
-	@Value("${petstore.signalr.service-url:}")
-	private String signalRServiceURL;
-	
-	@Value("${petstore.signalr.key:}")
-	private String signalRKey;
+    @Value("${petstore.signalr.negotiation-url:}")
+    private String signalRNegotiationURL;
 
-	private WebClient signalRWebClient = null;
+    @Value("${petstore.signalr.service-url:}")
+    private String signalRServiceURL;
 
-	public static String CURRENT_USERS_HUB = "currentUsers";
+    @Value("${petstore.signalr.key:}")
+    private String signalRKey;
 
-	@Autowired
-	private CacheManager currentUsersCacheManager;
+    public String getOrderItemsReserverURL() {
+        return orderItemsReserverURL;
+    }
 
-	@PostConstruct
-	private void initialize() throws JoranException {
-		// LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+    private WebClient signalRWebClient = null;
 
-		if (StringUtils.isNoneEmpty(this.getSignalRKey()) && StringUtils.isNoneEmpty(this.getSignalRNegotiationURL())
-				&& StringUtils.isNoneEmpty(this.getSignalRServiceURL())) {
-			this.signalRWebClient = WebClient.builder().baseUrl(this.getSignalRServiceURL()).build();
-		}
-		
-		try {
-			this.setContainerHostName(
-					InetAddress.getLocalHost().getHostAddress() + "/" + InetAddress.getLocalHost().getHostName());
-		} catch (UnknownHostException e) {
-			this.setContainerHostName("unknown");
-		}
+    public static String CURRENT_USERS_HUB = "currentUsers";
 
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			Version version = objectMapper.readValue(new ClassPathResource("version.json").getFile(), Version.class);
-			this.setAppVersion(version.getVersion());
-			this.setAppDate(version.getDate());
-		} catch (IOException e) {
-			logger.info("error parsing file " + e.getMessage());
-			this.setAppVersion("unknown");
-			this.setAppDate("unknown");
-		}
+    @Autowired
+    private CacheManager currentUsersCacheManager;
 
-		this.setYear(String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
+    @PostConstruct
+    private void initialize() throws JoranException {
+        // LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 
-		// fix this at some point so it doesnt need to be done in the filter each
-		// time...
-		// context.putProperty("appVersion", this.getAppVersion());
-		// context.putProperty("appDate", this.getAppDate());
-		// context.putProperty("containerHostName", this.getContainerHostName());
-	}
+        if (StringUtils.isNoneEmpty(this.getSignalRKey()) && StringUtils.isNoneEmpty(this.getSignalRNegotiationURL())
+                && StringUtils.isNoneEmpty(this.getSignalRServiceURL())) {
+            this.signalRWebClient = WebClient.builder().baseUrl(this.getSignalRServiceURL()).build();
+        }
 
-	public String generateJwt(String audience, String userId) {
-		SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+        try {
+            this.setContainerHostName(
+                    InetAddress.getLocalHost().getHostAddress() + "/" + InetAddress.getLocalHost().getHostName());
+        } catch (UnknownHostException e) {
+            this.setContainerHostName("unknown");
+        }
 
-		long nowMillis = System.currentTimeMillis();
-		Date now = new Date(nowMillis);
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            Version version = objectMapper.readValue(new ClassPathResource("version.json").getFile(), Version.class);
+            this.setAppVersion(version.getVersion());
+            this.setAppDate(version.getDate());
+        } catch (IOException e) {
+            logger.info("error parsing file " + e.getMessage());
+            this.setAppVersion("unknown");
+            this.setAppDate("unknown");
+        }
 
-		long expMillis = nowMillis + (30 * 30 * 1000);
-		Date exp = new Date(expMillis);
+        this.setYear(String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
 
-		byte[] apiKeySecretBytes = this.getSignalRKey().getBytes(StandardCharsets.UTF_8);
-		Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
+        // fix this at some point so it doesnt need to be done in the filter each
+        // time...
+        // context.putProperty("appVersion", this.getAppVersion());
+        // context.putProperty("appDate", this.getAppDate());
+        // context.putProperty("containerHostName", this.getContainerHostName());
+    }
 
-		JwtBuilder builder = Jwts.builder().setAudience(audience).setIssuedAt(now).setExpiration(exp)
-				.signWith(signingKey);
+    public String generateJwt(String audience, String userId) {
+        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
-		if (userId != null) {
-			builder.claim("nameid", userId);
-		}
+        long nowMillis = System.currentTimeMillis();
+        Date now = new Date(nowMillis);
 
-		return builder.compact();
-	}
+        long expMillis = nowMillis + (30 * 30 * 1000);
+        Date exp = new Date(expMillis);
 
-	public String getContainerHostName() {
-		return containerHostName;
-	}
+        byte[] apiKeySecretBytes = this.getSignalRKey().getBytes(StandardCharsets.UTF_8);
+        Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
 
-	public void setContainerHostName(String containerHostName) {
-		this.containerHostName = containerHostName;
-	}
+        JwtBuilder builder = Jwts.builder().setAudience(audience).setIssuedAt(now).setExpiration(exp)
+                .signWith(signingKey);
 
-	public String getAppVersion() {
-		if ("version".equals(this.appVersion) || this.appVersion == null) {
-			return String.valueOf(System.currentTimeMillis());
-		}
-		return this.appVersion;
-	}
+        if (userId != null) {
+            builder.claim("nameid", userId);
+        }
 
-	public void setAppVersion(String appVersion) {
-		this.appVersion = appVersion;
-	}
+        return builder.compact();
+    }
 
-	public String getPetStoreServicesSubscriptionKey() {
-		return petStoreServicesSubscriptionKey;
-	}
+    public String getContainerHostName() {
+        return containerHostName;
+    }
 
-	public void setPetStoreServicesSubscriptionKey(String petStoreServicesSubscriptionKey) {
-		this.petStoreServicesSubscriptionKey = petStoreServicesSubscriptionKey;
-	}
+    public void setContainerHostName(String containerHostName) {
+        this.containerHostName = containerHostName;
+    }
 
-	public String getAppDate() {
-		return appDate;
-	}
+    public String getAppVersion() {
+        if ("version".equals(this.appVersion) || this.appVersion == null) {
+            return String.valueOf(System.currentTimeMillis());
+        }
+        return this.appVersion;
+    }
 
-	public void setAppDate(String appDate) {
-		this.appDate = appDate;
-	}
+    public void setAppVersion(String appVersion) {
+        this.appVersion = appVersion;
+    }
 
-	public String getYear() {
-		return year;
-	}
+    public String getPetStoreServicesSubscriptionKey() {
+        return petStoreServicesSubscriptionKey;
+    }
 
-	public void setYear(String year) {
-		this.year = year;
-	}
+    public void setPetStoreServicesSubscriptionKey(String petStoreServicesSubscriptionKey) {
+        this.petStoreServicesSubscriptionKey = petStoreServicesSubscriptionKey;
+    }
 
-	public boolean isSecurityEnabled() {
-		return securityEnabled;
-	}
+    public String getAppDate() {
+        return appDate;
+    }
 
-	public void setSecurityEnabled(boolean securityEnabled) {
-		this.securityEnabled = securityEnabled;
-	}
+    public void setAppDate(String appDate) {
+        this.appDate = appDate;
+    }
 
-	public String getPetStorePetServiceURL() {
-		return petStorePetServiceURL;
-	}
+    public String getYear() {
+        return year;
+    }
 
-	public String getPetStoreProductServiceURL() {
-		return petStoreProductServiceURL;
-	}
+    public void setYear(String year) {
+        this.year = year;
+    }
 
-	public String getPetStoreOrderServiceURL() {
-		return petStoreOrderServiceURL;
-	}
+    public boolean isSecurityEnabled() {
+        return securityEnabled;
+    }
 
-	public String getPetstoreAPIMHost() {
-		return petstoreAPIMHost;
-	}
+    public void setSecurityEnabled(boolean securityEnabled) {
+        this.securityEnabled = securityEnabled;
+    }
 
-	public String getGaTrackingId() {
-		return gaTrackingId;
-	}
+    public String getPetStorePetServiceURL() {
+        return petStorePetServiceURL;
+    }
 
-	public String getBingSearchURL() {
-		return bingSearchURL;
-	}
+    public String getPetStoreProductServiceURL() {
+        return petStoreProductServiceURL;
+    }
 
-	public String getBingSearchSubscriptionKey() {
-		return bingSearchSubscriptionKey;
-	}
+    public String getPetStoreOrderServiceURL() {
+        return petStoreOrderServiceURL;
+    }
 
-	public List<String> getAdditionalHeadersToLog() {
-		return additionalHeadersToLog;
-	}
+    public String getPetstoreAPIMHost() {
+        return petstoreAPIMHost;
+    }
 
-	public List<String> getAdditionalHeadersToSend() {
-		return additionalHeadersToSend;
-	}
+    public String getGaTrackingId() {
+        return gaTrackingId;
+    }
 
-	public String getSignalRNegotiationURL() {
-		return signalRNegotiationURL;
-	}
+    public String getBingSearchURL() {
+        return bingSearchURL;
+    }
 
-	public String getSignalRServiceURL() {
-		return signalRServiceURL;
-	}
+    public String getBingSearchSubscriptionKey() {
+        return bingSearchSubscriptionKey;
+    }
 
-	public String getSignalRKey() {
-		return signalRKey;
-	}
+    public List<String> getAdditionalHeadersToLog() {
+        return additionalHeadersToLog;
+    }
 
-	@Scheduled(fixedRateString = "${petstore.signalr.update.fixedRate:60000}")
-	public void sendCurrentUsers() {
-		if (this.signalRWebClient == null) {
-			return;
-		}
-		String hubUri = "/api/v1/hubs/" + ContainerEnvironment.CURRENT_USERS_HUB;
-		String hubUrl = getSignalRServiceURL() + hubUri;
-		String accessKey = generateJwt(hubUrl, null);
+    public List<String> getAdditionalHeadersToSend() {
+        return additionalHeadersToSend;
+    }
 
-		CaffeineCache caffeineCache = (CaffeineCache) this.currentUsersCacheManager
-				.getCache(ContainerEnvironment.CURRENT_USERS_HUB);
-		com.github.benmanes.caffeine.cache.Cache<Object, Object> nativeCache = caffeineCache.getNativeCache();
-		int size = nativeCache.asMap().keySet().size();
+    public String getSignalRNegotiationURL() {
+        return signalRNegotiationURL;
+    }
 
-		logger.info("@Scheduled sending current users of size " + size);
+    public String getSignalRServiceURL() {
+        return signalRServiceURL;
+    }
 
-		this.signalRWebClient.post().uri(hubUri)
-				.body(BodyInserters.fromPublisher(
-						Mono.just(new SignalRMessage("currentUsersUpdated", new Object[] { size })),
-						SignalRMessage.class))
-				.accept(MediaType.APPLICATION_JSON).header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-				.header("Cache-Control", "no-cache").header("Authorization", "Bearer " + accessKey).retrieve()
-				.bodyToMono(Object.class).block();
-	}
+    public String getSignalRKey() {
+        return signalRKey;
+    }
+
+    @Scheduled(fixedRateString = "${petstore.signalr.update.fixedRate:60000}")
+    public void sendCurrentUsers() {
+        if (this.signalRWebClient == null) {
+            return;
+        }
+        String hubUri = "/api/v1/hubs/" + ContainerEnvironment.CURRENT_USERS_HUB;
+        String hubUrl = getSignalRServiceURL() + hubUri;
+        String accessKey = generateJwt(hubUrl, null);
+
+        CaffeineCache caffeineCache = (CaffeineCache) this.currentUsersCacheManager
+                .getCache(ContainerEnvironment.CURRENT_USERS_HUB);
+        com.github.benmanes.caffeine.cache.Cache<Object, Object> nativeCache = caffeineCache.getNativeCache();
+        int size = nativeCache.asMap().keySet().size();
+
+        logger.info("@Scheduled sending current users of size " + size);
+
+        this.signalRWebClient.post().uri(hubUri)
+                .body(BodyInserters.fromPublisher(
+                        Mono.just(new SignalRMessage("currentUsersUpdated", new Object[]{size})),
+                        SignalRMessage.class))
+                .accept(MediaType.APPLICATION_JSON).header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .header("Cache-Control", "no-cache").header("Authorization", "Bearer " + accessKey).retrieve()
+                .bodyToMono(Object.class).block();
+    }
 }

@@ -13,13 +13,16 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.applicationinsights.core.dependencies.google.common.io.CharStreams;
 
 import ch.qos.logback.core.joran.spi.JoranException;
 
+@Component
 @SuppressWarnings("serial")
 public class ContainerEnvironment implements Serializable {
 	private static Logger logger = LoggerFactory.getLogger(ContainerEnvironment.class);
@@ -28,6 +31,13 @@ public class ContainerEnvironment implements Serializable {
 	private String appDate = null;
 	private String year = null;
 	private String author = "Chris Tremblay MSFT";
+
+	@Value("${petstore.function.orderitemsreserver.url:}")
+	private String orderItemsReserverURL;
+
+	public String getOrderItemsReserverURL() {
+		return orderItemsReserverURL;
+	}
 
 	@PostConstruct
 	private void initialize() throws JoranException {

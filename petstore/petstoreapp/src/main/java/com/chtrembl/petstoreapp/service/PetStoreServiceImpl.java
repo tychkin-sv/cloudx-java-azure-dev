@@ -7,12 +7,14 @@ package com.chtrembl.petstoreapp.service;
 import com.chtrembl.petstoreapp.model.Category;
 import com.chtrembl.petstoreapp.model.ContainerEnvironment;
 import com.chtrembl.petstoreapp.model.Order;
+import com.chtrembl.petstoreapp.model.OrderReservationRequest;
 import com.chtrembl.petstoreapp.model.Pet;
 import com.chtrembl.petstoreapp.model.Product;
 import com.chtrembl.petstoreapp.model.Tag;
 import com.chtrembl.petstoreapp.model.User;
 import com.chtrembl.petstoreapp.model.WebRequest;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 

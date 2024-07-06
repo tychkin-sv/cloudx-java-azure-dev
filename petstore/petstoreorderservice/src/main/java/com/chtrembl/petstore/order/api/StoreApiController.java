@@ -2,9 +2,13 @@ package com.chtrembl.petstore.order.api;
 
 import com.chtrembl.petstore.order.model.ContainerEnvironment;
 import com.chtrembl.petstore.order.model.Order;
+import com.chtrembl.petstore.order.model.OrderReservationRequest;
 import com.chtrembl.petstore.order.model.Product;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiParam;
+import reactor.core.publisher.Mono;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -12,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +24,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.io.IOException;
@@ -27,6 +35,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-12-21T10:17:19.885-05:00")
 
@@ -55,10 +64,18 @@ public class StoreApiController implements StoreApi {
 		return storeApiCache;
 	}
 
+	private WebClient orderItemsReserverWebClient;
+
 	@org.springframework.beans.factory.annotation.Autowired
 	public StoreApiController(ObjectMapper objectMapper, NativeWebRequest request) {
 		this.objectMapper = objectMapper;
 		this.request = request;
+	}
+
+	@PostConstruct
+	public void init() {
+		this.orderItemsReserverWebClient = WebClient.builder().baseUrl(this.containerEnvironment.getOrderItemsReserverURL())
+				.build();
 	}
 
 	// should really be in an interceptor
@@ -212,6 +229,20 @@ public class StoreApiController implements StoreApi {
 							orderId, e.getMessage()));
 				}
 			}
+			String sessionId = this.request.getSessionId();
+			try {
+				OrderReservationRequest orderReservationRequest = createOrderReservationRequest(order, sessionId);
+				this.orderItemsReserverWebClient.post()
+						.uri("api/saveOrUpdateOrderItems")
+						.body(BodyInserters.fromPublisher(Mono.just(orderReservationRequest), OrderReservationRequest.class))
+						.accept(MediaType.APPLICATION_JSON)
+						.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+						.header("Cache-Control", "no-cache")
+						.retrieve()
+						.bodyToMono(String.class).block();
+			} catch (JsonProcessingException e) {
+				log.warn(e.getMessage());
+			}
 
 			try {
 				ApiUtil.setResponse(request, "application/json", new ObjectMapper().writeValueAsString(order));
@@ -223,6 +254,20 @@ public class StoreApiController implements StoreApi {
 		}
 
 		return new ResponseEntity<Order>(HttpStatus.NOT_IMPLEMENTED);
+	}
+
+
+	private OrderReservationRequest createOrderReservationRequest(Order order, String sessionId) throws JsonProcessingException {
+		List<Product> products;
+		if (Objects.nonNull(order) && Objects.nonNull(order.getProducts())) {
+			products = order.getProducts();
+		} else {
+			products = List.of();
+		}
+		return OrderReservationRequest.builder()
+				.sessionId(sessionId)
+				.orderJSON(objectMapper.writeValueAsString(products))
+				.build();
 	}
 
 	private Product getProduct(List<Product> products, Long id) {
