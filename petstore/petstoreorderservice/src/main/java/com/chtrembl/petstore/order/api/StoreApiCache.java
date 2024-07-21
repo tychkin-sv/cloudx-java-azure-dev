@@ -41,6 +41,14 @@ public class StoreApiCache {
 	@Value("${petstore.service.product.url:}")
 	private String petStoreProductServiceURL;
 
+	@Value("${petstore.function.orderitemsreserver.url:}")
+	private String petStoreFunctionOrderItemsReserverURL;
+
+
+	public String getPetStoreFunctionServiceURL() {
+		return petStoreFunctionOrderItemsReserverURL;
+	}
+
 	@Autowired
 	private RestTemplate restTemplate;
 
