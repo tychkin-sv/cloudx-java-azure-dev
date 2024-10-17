@@ -1,3 +1,3 @@
 # List all images with name containing 'pet'
-# Usage: ./bin/listimages.sh
+# Usage: .bin/containers/listimages.sh
 docker images | grep 'pet'
