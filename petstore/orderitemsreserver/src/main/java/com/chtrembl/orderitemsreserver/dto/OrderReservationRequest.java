@@ -1,4 +1,4 @@
-package com.tsv.dto;
+package com.chtrembl.orderitemsreserver.dto;
 
 import lombok.Builder;
 import lombok.Getter;

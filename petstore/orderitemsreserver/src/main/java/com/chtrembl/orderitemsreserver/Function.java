@@ -1,4 +1,4 @@
-package com.tsv;
+package com.chtrembl.orderitemsreserver;
 
 import com.microsoft.azure.functions.ExecutionContext;
 import com.microsoft.azure.functions.HttpMethod;
@@ -8,15 +8,15 @@ import com.microsoft.azure.functions.HttpStatus;
 import com.microsoft.azure.functions.annotation.AuthorizationLevel;
 import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.HttpTrigger;
-import com.tsv.dto.OrderReservationRequest;
-import com.tsv.service.BlobService;
+import com.chtrembl.orderitemsreserver.dto.OrderReservationRequest;
+import com.chtrembl.orderitemsreserver.service.BlobService;
 
 import java.util.Optional;
 
 public class Function {
 
     private final String BLOB_CONNECTION_STRING =
-            System.getenv("BLOB_CONNECTION_STRING_AZURE") != null ? System.getenv("BLOB_CONNECTION_STRING_AZURE") :
+            System.getenv("BLOB_CONNECTION_STRING") != null ? System.getenv("BLOB_CONNECTION_STRING") :
                     "not set";
 
     private final BlobService blobService = new BlobService(BLOB_CONNECTION_STRING);
@@ -29,7 +29,7 @@ public class Function {
                     authLevel = AuthorizationLevel.ANONYMOUS)
             HttpRequestMessage<Optional<OrderReservationRequest>> request,
             final ExecutionContext context) {
-        context.getLogger().info("BLOB_CONNECTION_STRING_AZURE: " + BLOB_CONNECTION_STRING);
+        context.getLogger().info("BLOB_CONNECTION_STRING: " + BLOB_CONNECTION_STRING);
         Optional<OrderReservationRequest> body = request.getBody();
 
         // Check if the request body is present

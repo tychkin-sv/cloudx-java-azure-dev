@@ -60,9 +60,6 @@ public class ContainerEnvironment implements Serializable {
     @Value("${petstore.service.order.url:}")
     private String petStoreOrderServiceURL;
 
-    @Value("${petstore.function.orderitemsreserver.url:}")
-    private String orderItemsReserverURL;
-
     @Value("${petstore.service.subscription.key:}")
     private String petStoreServicesSubscriptionKey;
 
@@ -92,10 +89,6 @@ public class ContainerEnvironment implements Serializable {
 
     @Value("${petstore.signalr.key:}")
     private String signalRKey;
-
-    public String getOrderItemsReserverURL() {
-        return orderItemsReserverURL;
-    }
 
     private WebClient signalRWebClient = null;
 

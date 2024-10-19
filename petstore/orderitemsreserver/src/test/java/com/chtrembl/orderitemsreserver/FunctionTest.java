@@ -1,7 +1,7 @@
-package com.tsv;
+package com.chtrembl.orderitemsreserver;
 
 import com.microsoft.azure.functions.*;
-import com.tsv.dto.OrderReservationRequest;
+import com.chtrembl.orderitemsreserver.dto.OrderReservationRequest;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;

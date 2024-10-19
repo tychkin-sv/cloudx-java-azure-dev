@@ -14,7 +14,12 @@
         <java.version>11</java.version>
         <azure.functions.maven.plugin.version>1.24.0</azure.functions.maven.plugin.version>
         <azure.functions.java.library.version>2.2.0</azure.functions.java.library.version>
-        <functionAppName>tsv-functions-20240703204011609</functionAppName>
+        <functionAppName>tsv-function-1</functionAppName>
+        <functionAppRegion>eastus</functionAppRegion>
+        <functionResourceGroup>func_rg</functionResourceGroup>
+        <functionAppServicePlanName>tsv-function-plan</functionAppServicePlanName>
+        <functionPricingTier>B1</functionPricingTier>
+        <appInsights>tsv-ai</appInsights>
     </properties>
 
     <dependencies>
@@ -70,31 +75,29 @@
                 <artifactId>azure-functions-maven-plugin</artifactId>
                 <version>${azure.functions.maven.plugin.version}</version>
                 <configuration>
-                    <!-- function app name -->
                     <appName>${functionAppName}</appName>
-                    <!-- function app resource group -->
-                    <resourceGroup>java-functions-group</resourceGroup>
-                    <!-- function app service plan name -->
-                    <appServicePlanName>java-functions-app-service-plan</appServicePlanName>
-                    <!-- function app region-->
-                    <!-- refers https://github.com/microsoft/azure-maven-plugins/wiki/Azure-Functions:-Configuration-Details#supported-regions for all valid values -->
-                    <region>westus</region>
-                    <!-- function pricingTier, default to be consumption if not specified -->
-                    <!-- refers https://github.com/microsoft/azure-maven-plugins/wiki/Azure-Functions:-Configuration-Details#supported-pricing-tiers for all valid values -->
-                    <pricingTier>EP1</pricingTier>
-                    <!-- Whether to disable application insights, default is false -->
-                    <!-- refers https://github.com/microsoft/azure-maven-plugins/wiki/Azure-Functions:-Configuration-Details for all valid configurations for application insights-->
-                    <!-- <disableAppInsights></disableAppInsights> -->
+                    <resourceGroup>${functionResourceGroup}</resourceGroup>
+                    <region>${functionAppRegion}</region>
+                    <appServicePlanName>${functionAppServicePlanName}</appServicePlanName>
+                    <appInsightsInstance>${appInsights}</appInsightsInstance>
+                    <pricingTier>${functionPricingTier}</pricingTier>
+
+                    <hostJson>${project.basedir}/src/main/resources/host.json</hostJson>
+                    <localSettingsJson>${project.basedir}/src/main/resources/local.settings.json</localSettingsJson>
+
                     <runtime>
-                        <os>docker</os>
-                        <image>[hub-user/]repo-name[:tag]</image>
-                        <serverId></serverId>
-                        <registryUrl></registryUrl>
+                        <os>linux</os>
+                        <javaVersion>${java.version}</javaVersion>
                     </runtime>
+
                     <appSettings>
                         <property>
                             <name>FUNCTIONS_EXTENSION_VERSION</name>
                             <value>~4</value>
+                        </property>
+                        <property>
+                            <name>MAIN_CLASS</name>
+                            <value>com.chtrembl.orderitemsreserver.Function</value>
                         </property>
                     </appSettings>
                 </configuration>

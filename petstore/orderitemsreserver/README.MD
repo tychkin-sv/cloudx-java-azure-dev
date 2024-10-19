@@ -1,17 +1,20 @@
 ## Console
 mvn clean package  
 ## Run the function locally
-There are two ways to run function
-1. Maven
-mvn azure-functions:run
-2. IntelliJ
+You need to have Azure Functions Core Tools installed on your machine from 
+[link here](https://go.microsoft.com/fwlink/?linkid=2174087)
 
+After you can use Maven to run the function locally:
+
+```sh
+mvn azure-functions:run
+```
 
 ## Blob storage emulator
 azurite --silent --location c:\azurite --debug c:\azurite\debug.log
 
-
 Press Ctrl+C (Command+C on macOS) to stop the host.
+
 
 ## Build the container image and verify locally
 
