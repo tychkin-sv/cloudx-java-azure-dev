@@ -6,6 +6,13 @@ import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import io.swagger.annotations.ApiModelProperty;
 
 /**
@@ -14,11 +21,16 @@ import io.swagger.annotations.ApiModelProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-12-20T15:31:39.272-05:00")
 
+@Entity
+@Table(name = "category")
 public class Category {
-	@JsonProperty("id")
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id", nullable = false)
 	private Long id = null;
 
-	@JsonProperty("name")
+	@Column(name = "name", nullable = false)
 	private String name = null;
 
 	public Category id(Long id) {

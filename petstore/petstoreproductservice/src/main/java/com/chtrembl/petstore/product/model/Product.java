@@ -1,17 +1,28 @@
 package com.chtrembl.petstore.product.model;
 
+import com.chtrembl.petstore.product.converter.StatusEnumConverter;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import org.springframework.validation.annotation.Validated;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-
-import org.springframework.validation.annotation.Validated;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -21,235 +32,253 @@ import io.swagger.annotations.ApiModelProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-12-20T15:31:39.272-05:00")
 
+@Entity
+@Table(name = "product")
 public class Product {
-	@JsonProperty("id")
-	private Long id;
 
-	@JsonProperty("category")
-	private Category category;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
 
-	@JsonProperty("name")
-	private String name;
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
-	@JsonProperty("photoURL")
-	@Valid
-	private String photoURL;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-	@JsonProperty("tags")
-	@Valid
-	private List<Tag> tags = null;
+    @Valid
+    @Column(name = "photoURL", nullable = false)
+    private String photoURL;
 
-	/**
-	 * pet status in the store
-	 */
-	public enum StatusEnum {
-		AVAILABLE("available"),
+    @Valid
+    @ManyToMany
+    @JoinTable(
+            name = "product_tag",
+            joinColumns = @JoinColumn(
+                    name = "product_id",
+                    nullable = false
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "tag_id",
+                    nullable = false
+            )
+    )
+    private List<Tag> tags;
 
-		PENDING("pending"),
+    @Column(name = "status", nullable = false)
+    @Convert(converter = StatusEnumConverter.class)
+    private StatusEnum status;
 
-		SOLD("sold");
+    /**
+     * pet status in the store
+     */
+    public enum StatusEnum {
+        AVAILABLE("available"),
 
-		private String value;
+        PENDING("pending"),
 
-		StatusEnum(String value) {
-			this.value = value;
-		}
+        SOLD("sold");
 
-		@JsonValue
-		public String getValue() {
-			return value;
-		}
+        private String value;
 
-		@Override
-		public String toString() {
-			return String.valueOf(value);
-		}
+        StatusEnum(String value) {
+            this.value = value;
+        }
 
-		@JsonCreator
-		public static StatusEnum fromValue(String value) {
-			for (StatusEnum b : StatusEnum.values()) {
-				if (b.value.equals(value)) {
-					return b;
-				}
-			}
-			throw new IllegalArgumentException("Unexpected value '" + value + "'");
-		}
-	}
+        @JsonValue
+        public String getValue() {
+            return value;
+        }
 
-	@JsonProperty("status")
-	private StatusEnum status;
+        @Override
+        public String toString() {
+            return String.valueOf(value);
+        }
 
-	public Product id(Long id) {
-		this.id = id;
-		return this;
-	}
+        @JsonCreator
+        public static StatusEnum fromValue(String value) {
+            for (StatusEnum b : StatusEnum.values()) {
+                if (b.value.equals(value)) {
+                    return b;
+                }
+            }
+            throw new IllegalArgumentException("Unexpected value '" + value + "'");
+        }
+    }
 
-	/**
-	 * Get id
-	 * 
-	 * @return id
-	 */
-	@ApiModelProperty(value = "")
+    public Product id(Long id) {
+        this.id = id;
+        return this;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    /**
+     * Get id
+     *
+     * @return id
+     */
+    @ApiModelProperty(value = "")
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public Product category(Category category) {
-		this.category = category;
-		return this;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	/**
-	 * Get category
-	 * 
-	 * @return category
-	 */
-	@ApiModelProperty(value = "")
+    public Product category(Category category) {
+        this.category = category;
+        return this;
+    }
 
-	@Valid
+    /**
+     * Get category
+     *
+     * @return category
+     */
+    @ApiModelProperty(value = "")
 
-	public Category getCategory() {
-		return category;
-	}
+    @Valid
 
-	public void setCategory(Category category) {
-		this.category = category;
-	}
+    public Category getCategory() {
+        return category;
+    }
 
-	public Product name(String name) {
-		this.name = name;
-		return this;
-	}
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 
-	/**
-	 * Get name
-	 * 
-	 * @return name
-	 */
-	@ApiModelProperty(example = "doggie", required = true, value = "")
-	@NotNull
+    public Product name(String name) {
+        this.name = name;
+        return this;
+    }
 
-	public String getName() {
-		return name;
-	}
+    /**
+     * Get name
+     *
+     * @return name
+     */
+    @ApiModelProperty(example = "doggie", required = true, value = "")
+    @NotNull
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	/**
-	 * Get photoUrls
-	 * 
-	 * @return photoUrls
-	 */
-	@ApiModelProperty(required = true, value = "")
-	@NotNull
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getPhotoURL() {
-		return photoURL;
-	}
+    /**
+     * Get photoUrls
+     *
+     * @return photoUrls
+     */
+    @ApiModelProperty(required = true, value = "")
+    @NotNull
 
-	public void setPhotoURL(String photoURL) {
-		this.photoURL = photoURL;
-	}
+    public String getPhotoURL() {
+        return photoURL;
+    }
 
-	public Product tags(List<Tag> tags) {
-		this.tags = tags;
-		return this;
-	}
+    public void setPhotoURL(String photoURL) {
+        this.photoURL = photoURL;
+    }
 
-	public Product addTagsItem(Tag tagsItem) {
-		if (this.tags == null) {
-			this.tags = new ArrayList<>();
-		}
-		this.tags.add(tagsItem);
-		return this;
-	}
+    public Product tags(List<Tag> tags) {
+        this.tags = tags;
+        return this;
+    }
 
-	/**
-	 * Get tags
-	 * 
-	 * @return tags
-	 */
-	@ApiModelProperty(value = "")
+    public Product addTagsItem(Tag tagsItem) {
+        if (this.tags == null) {
+            this.tags = new ArrayList<>();
+        }
+        this.tags.add(tagsItem);
+        return this;
+    }
 
-	@Valid
+    /**
+     * Get tags
+     *
+     * @return tags
+     */
+    @ApiModelProperty(value = "")
 
-	public List<Tag> getTags() {
-		return tags;
-	}
+    @Valid
 
-	public void setTags(List<Tag> tags) {
-		this.tags = tags;
-	}
+    public List<Tag> getTags() {
+        return tags;
+    }
 
-	public Product status(StatusEnum status) {
-		this.status = status;
-		return this;
-	}
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
 
-	/**
-	 * pet status in the store
-	 * 
-	 * @return status
-	 */
-	@ApiModelProperty(value = "pet status in the store")
+    public Product status(StatusEnum status) {
+        this.status = status;
+        return this;
+    }
 
-	public StatusEnum getStatus() {
-		return status;
-	}
+    /**
+     * pet status in the store
+     *
+     * @return status
+     */
+    @ApiModelProperty(value = "pet status in the store")
 
-	public void setStatus(StatusEnum status) {
-		this.status = status;
-	}
+    public StatusEnum getStatus() {
+        return status;
+    }
 
-	@Override
-	public boolean equals(java.lang.Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		Product product = (Product) o;
-		return Objects.equals(this.id, product.id) && Objects.equals(this.category, product.category)
-				&& Objects.equals(this.name, product.name) && Objects.equals(this.photoURL, product.photoURL)
-				&& Objects.equals(this.tags, product.tags) && Objects.equals(this.status, product.status);
-	}
+    public void setStatus(StatusEnum status) {
+        this.status = status;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(id, category, name, photoURL, tags, status);
-	}
+    @Override
+    public boolean equals(java.lang.Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Product product = (Product) o;
+        return Objects.equals(this.id, product.id) && Objects.equals(this.category, product.category)
+                && Objects.equals(this.name, product.name) && Objects.equals(this.photoURL, product.photoURL)
+                && Objects.equals(this.tags, product.tags) && Objects.equals(this.status, product.status);
+    }
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("class Pet {\n");
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, category, name, photoURL, tags, status);
+    }
 
-		sb.append("    id: ").append(toIndentedString(id)).append("\n");
-		sb.append("    category: ").append(toIndentedString(category)).append("\n");
-		sb.append("    name: ").append(toIndentedString(name)).append("\n");
-		sb.append("    photoUrls: ").append(toIndentedString(photoURL)).append("\n");
-		sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
-		sb.append("    status: ").append(toIndentedString(status)).append("\n");
-		sb.append("}");
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("class Pet {\n");
 
-	/**
-	 * Convert the given object to string with each line indented by 4 spaces
-	 * (except the first line).
-	 */
-	private String toIndentedString(java.lang.Object o) {
-		if (o == null) {
-			return "null";
-		}
-		return o.toString().replace("\n", "\n    ");
-	}
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    category: ").append(toIndentedString(category)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    photoUrls: ").append(toIndentedString(photoURL)).append("\n");
+        sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
+        sb.append("    status: ").append(toIndentedString(status)).append("\n");
+        sb.append("}");
+        return sb.toString();
+    }
+
+    /**
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
+    private String toIndentedString(java.lang.Object o) {
+        if (o == null) {
+            return "null";
+        }
+        return o.toString().replace("\n", "\n    ");
+    }
 }
