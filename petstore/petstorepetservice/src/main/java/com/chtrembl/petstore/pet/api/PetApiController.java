@@ -33,6 +33,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.ApiParam;
+import io.swagger.service.PetService;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-12-20T15:31:39.272-05:00")
 
@@ -49,12 +50,7 @@ public class PetApiController implements PetApi {
 	private ContainerEnvironment containerEnvironment;
 
 	@Autowired
-	private DataPreload dataPreload;
-
-	@Override
-	public DataPreload getBeanToBeAutowired() {
-		return dataPreload;
-	}
+	private PetService petService;
 
 	@org.springframework.beans.factory.annotation.Autowired
 	public PetApiController(ObjectMapper objectMapper, NativeWebRequest request) {
@@ -100,7 +96,8 @@ public class PetApiController implements PetApi {
 					"PetStorePetService incoming GET request to petstorepetservice/v2/pet/findPetsByStatus?status=%s",
 					status));
 			try {
-				String petsJSON = new ObjectMapper().writeValueAsString(this.getPreloadedPets());
+				List<Pet> pets = petService.getPets();
+				String petsJSON = new ObjectMapper().writeValueAsString(pets);
 				ApiUtil.setResponse(request, "application/json", petsJSON);
 				return new ResponseEntity<>(HttpStatus.OK);
 			} catch (JsonProcessingException e) {

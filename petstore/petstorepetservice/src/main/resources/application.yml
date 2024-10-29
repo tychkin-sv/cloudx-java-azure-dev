@@ -13,6 +13,21 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+  datasource:
+    url: ${PET_DB_URI:jdbc:postgresql://tsv-postgesql.postgres.database.azure.com:5432/petstorepetservice_db}
+    username: ${PET_DB_USERNAME:postgres}
+    password: ${PET_DB_PASSWORD:22tsv81SQL}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    baseline-on-migrate: true
+
 management:
   endpoints:
     web:
