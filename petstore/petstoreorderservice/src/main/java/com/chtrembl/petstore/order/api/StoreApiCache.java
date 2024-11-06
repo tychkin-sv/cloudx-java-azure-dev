@@ -31,9 +31,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.swagger.service.OrderService;
+
 @Component
 @EnableScheduling
 public class StoreApiCache {
+
 	static final Logger log = LoggerFactory.getLogger(StoreApiCache.class);
 
 	private final ObjectMapper objectMapper;
@@ -50,6 +53,9 @@ public class StoreApiCache {
 	}
 
 	@Autowired
+	private OrderService orderService;
+
+	@Autowired
 	private RestTemplate restTemplate;
 
 	@Autowired
@@ -64,7 +70,7 @@ public class StoreApiCache {
 	@Cacheable("orders")
 	public Order getOrder(String id) {
 		log.info(String.format("PetStoreOrderService creating new order id:%s and caching it", id));
-		return new Order();
+		return orderService.get(id);
 	}
 
 	@Cacheable("orders")

@@ -1,18 +1,21 @@
 package com.chtrembl.petstore.order.model;
 
+import com.azure.spring.data.cosmos.core.mapping.Container;
+import com.azure.spring.data.cosmos.core.mapping.PartitionKey;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.validation.annotation.Validated;
+import org.threeten.bp.OffsetDateTime;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import javax.validation.Valid;
-
-import org.springframework.validation.annotation.Validated;
-import org.threeten.bp.OffsetDateTime;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -22,255 +25,257 @@ import io.swagger.annotations.ApiModelProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-12-23T15:16:30.446-05:00")
 
+@Container(containerName = "orders")
 public class Order implements Serializable {
-	@JsonProperty("id")
-	private String id = null;
 
-	@JsonProperty("email")
-	private String email = null;
+    @Id
+    private String id;
 
-	@JsonProperty("products")
-	@Valid
-	private List<Product> products = null;
+    @PartitionKey
+    private String email;
 
-	@JsonProperty("shipDate")
-	private OffsetDateTime shipDate = null;
+    @JsonProperty("products")
+    @Valid
+    private List<Product> products;
 
-	@JsonProperty("tags")
-	@Valid
-	private List<Tag> tags = null;
+    @JsonProperty("shipDate")
+    private OffsetDateTime shipDate;
 
-	/**
-	 * Order Status
-	 */
-	public enum StatusEnum {
-		PLACED("placed"),
+    @JsonProperty("tags")
+    @Valid
+    private List<Tag> tags;
 
-		APPROVED("approved"),
+    /**
+     * Order Status
+     */
+    public enum StatusEnum {
+        PLACED("placed"),
 
-		DELIVERED("delivered");
+        APPROVED("approved"),
 
-		private String value;
+        DELIVERED("delivered");
 
-		StatusEnum(String value) {
-			this.value = value;
-		}
+        private String value;
 
-		@Override
-		@JsonValue
-		public String toString() {
-			return String.valueOf(value);
-		}
+        StatusEnum(String value) {
+            this.value = value;
+        }
 
-		@JsonCreator
-		public static StatusEnum fromValue(String text) {
-			for (StatusEnum b : StatusEnum.values()) {
-				if (String.valueOf(b.value).equals(text)) {
-					return b;
-				}
-			}
-			return null;
-		}
-	}
+        @Override
+        @JsonValue
+        public String toString() {
+            return String.valueOf(value);
+        }
 
-	@JsonProperty("status")
-	private StatusEnum status = null;
+        @JsonCreator
+        public static StatusEnum fromValue(String text) {
+            for (StatusEnum b : StatusEnum.values()) {
+                if (String.valueOf(b.value).equals(text)) {
+                    return b;
+                }
+            }
+            return null;
+        }
+    }
 
-	@JsonProperty("complete")
-	private Boolean complete = null;
+    @JsonProperty("status")
+    private StatusEnum status;
 
-	public Order id(String id) {
-		this.id = id;
-		return this;
-	}
+    @JsonProperty("complete")
+    private Boolean complete;
 
-	/**
-	 * Get id
-	 * 
-	 * @return id
-	 **/
-	@ApiModelProperty(value = "")
+    public Order id(String id) {
+        this.id = id;
+        return this;
+    }
 
-	public String getId() {
-		return id;
-	}
+    /**
+     * Get id
+     *
+     * @return id
+     **/
+    @ApiModelProperty(value = "")
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public Order products(List<Product> products) {
-		this.products = products;
-		return this;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public Order addProductsItem(Product productsItem) {
-		if (this.products == null) {
-			this.products = new ArrayList<Product>();
-		}
-		this.products.add(productsItem);
-		return this;
-	}
+    public Order products(List<Product> products) {
+        this.products = products;
+        return this;
+    }
 
-	/**
-	 * Get products
-	 * 
-	 * @return products
-	 **/
-	@ApiModelProperty(value = "")
+    public Order addProductsItem(Product productsItem) {
+        if (this.products == null) {
+            this.products = new ArrayList<Product>();
+        }
+        this.products.add(productsItem);
+        return this;
+    }
 
-	@Valid
+    /**
+     * Get products
+     *
+     * @return products
+     **/
+    @ApiModelProperty(value = "")
 
-	public List<Product> getProducts() {
-		return products;
-	}
+    @Valid
 
-	public void setProducts(List<Product> products) {
-		this.products = products;
-	}
+    public List<Product> getProducts() {
+        return products;
+    }
 
-	public Order shipDate(OffsetDateTime shipDate) {
-		this.shipDate = shipDate;
-		return this;
-	}
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }
 
-	/**
-	 * Get shipDate
-	 * 
-	 * @return shipDate
-	 **/
-	@ApiModelProperty(value = "")
+    public Order shipDate(OffsetDateTime shipDate) {
+        this.shipDate = shipDate;
+        return this;
+    }
 
-	@Valid
+    /**
+     * Get shipDate
+     *
+     * @return shipDate
+     **/
+    @ApiModelProperty(value = "")
 
-	public OffsetDateTime getShipDate() {
-		return shipDate;
-	}
+    @Valid
 
-	public void setShipDate(OffsetDateTime shipDate) {
-		this.shipDate = shipDate;
-	}
+    public OffsetDateTime getShipDate() {
+        return shipDate;
+    }
 
-	public Order tags(List<Tag> tags) {
-		this.tags = tags;
-		return this;
-	}
+    public void setShipDate(OffsetDateTime shipDate) {
+        this.shipDate = shipDate;
+    }
 
-	public Order addTagsItem(Tag tagsItem) {
-		if (this.tags == null) {
-			this.tags = new ArrayList<Tag>();
-		}
-		this.tags.add(tagsItem);
-		return this;
-	}
+    public Order tags(List<Tag> tags) {
+        this.tags = tags;
+        return this;
+    }
 
-	/**
-	 * Get tags
-	 * 
-	 * @return tags
-	 **/
-	@ApiModelProperty(value = "")
+    public Order addTagsItem(Tag tagsItem) {
+        if (this.tags == null) {
+            this.tags = new ArrayList<Tag>();
+        }
+        this.tags.add(tagsItem);
+        return this;
+    }
 
-	@Valid
+    /**
+     * Get tags
+     *
+     * @return tags
+     **/
+    @ApiModelProperty(value = "")
 
-	public List<Tag> getTags() {
-		return tags;
-	}
+    @Valid
 
-	public void setTags(List<Tag> tags) {
-		this.tags = tags;
-	}
+    public List<Tag> getTags() {
+        return tags;
+    }
 
-	public Order status(StatusEnum status) {
-		this.status = status;
-		return this;
-	}
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
 
-	/**
-	 * Order Status
-	 * 
-	 * @return status
-	 **/
-	@ApiModelProperty(value = "Order Status")
+    public Order status(StatusEnum status) {
+        this.status = status;
+        return this;
+    }
 
-	public StatusEnum getStatus() {
-		return status;
-	}
+    /**
+     * Order Status
+     *
+     * @return status
+     **/
+    @ApiModelProperty(value = "Order Status")
 
-	public void setStatus(StatusEnum status) {
-		this.status = status;
-	}
+    public StatusEnum getStatus() {
+        return status;
+    }
 
-	public Order complete(Boolean complete) {
-		this.complete = complete;
-		return this;
-	}
+    public void setStatus(StatusEnum status) {
+        this.status = status;
+    }
 
-	/**
-	 * Get complete
-	 * 
-	 * @return complete
-	 **/
-	@ApiModelProperty(value = "")
+    public Order complete(Boolean complete) {
+        this.complete = complete;
+        return this;
+    }
 
-	public Boolean isComplete() {
-		return complete;
-	}
+    /**
+     * Get complete
+     *
+     * @return complete
+     **/
+    @ApiModelProperty(value = "")
 
-	public void setComplete(Boolean complete) {
-		this.complete = complete;
-	}
+    public Boolean isComplete() {
+        return complete;
+    }
 
-	@Override
-	public boolean equals(java.lang.Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		Order order = (Order) o;
-		return Objects.equals(this.id, order.id) && Objects.equals(this.products, order.products)
-				&& Objects.equals(this.shipDate, order.shipDate) && Objects.equals(this.tags, order.tags)
-				&& Objects.equals(this.status, order.status) && Objects.equals(this.complete, order.complete);
-	}
+    public void setComplete(Boolean complete) {
+        this.complete = complete;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(id, products, shipDate, tags, status, complete);
-	}
+    @Override
+    public boolean equals(java.lang.Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Order order = (Order) o;
+        return Objects.equals(this.id, order.id) && Objects.equals(this.products, order.products)
+                && Objects.equals(this.shipDate, order.shipDate) && Objects.equals(this.tags, order.tags)
+                && Objects.equals(this.status, order.status) && Objects.equals(this.complete, order.complete);
+    }
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("class Order {\n");
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, products, shipDate, tags, status, complete);
+    }
 
-		sb.append("    id: ").append(toIndentedString(id)).append("\n");
-		sb.append("    products: ").append(toIndentedString(products)).append("\n");
-		sb.append("    shipDate: ").append(toIndentedString(shipDate)).append("\n");
-		sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
-		sb.append("    status: ").append(toIndentedString(status)).append("\n");
-		sb.append("    complete: ").append(toIndentedString(complete)).append("\n");
-		sb.append("}");
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("class Order {\n");
 
-	/**
-	 * Convert the given object to string with each line indented by 4 spaces
-	 * (except the first line).
-	 */
-	private String toIndentedString(java.lang.Object o) {
-		if (o == null) {
-			return "null";
-		}
-		return o.toString().replace("\n", "\n    ");
-	}
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    products: ").append(toIndentedString(products)).append("\n");
+        sb.append("    shipDate: ").append(toIndentedString(shipDate)).append("\n");
+        sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
+        sb.append("    status: ").append(toIndentedString(status)).append("\n");
+        sb.append("    complete: ").append(toIndentedString(complete)).append("\n");
+        sb.append("}");
+        return sb.toString();
+    }
+
+    /**
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
+    private String toIndentedString(java.lang.Object o) {
+        if (o == null) {
+            return "null";
+        }
+        return o.toString().replace("\n", "\n    ");
+    }
 }
