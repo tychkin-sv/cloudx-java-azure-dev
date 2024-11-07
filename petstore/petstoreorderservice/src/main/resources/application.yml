@@ -14,12 +14,21 @@ petstore:
     orderitemsreserver:
       url: ${ORDERITEMSRESERVER_URL:http://localhost:8084}
 
+
+
 spring:
   application:
     name: petstoreorderservice
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+
+  cloud:
+    azure:
+      cosmos:
+        endpoint: ${COSMOS_DB_ENDPOINT}
+        key: ${COSMOS_DB_KEY}
+        database: ${COSMOS_DB_DATABASE}
 
 management:
   endpoints:
@@ -35,4 +44,4 @@ management:
 
 azure:
   application-insights:
-    instrumentation-key: ${PETSTORESERVICES_AI_INSTRUMENTATION_KEY:e9fc272f-5d38-406b-b496-02cae7d3fd0f}
+    instrumentation-key: ${PETSTORESERVICES_AI_INSTRUMENTATION_KEY}

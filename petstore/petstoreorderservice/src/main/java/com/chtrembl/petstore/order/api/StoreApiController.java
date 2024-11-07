@@ -7,6 +7,7 @@ import com.chtrembl.petstore.order.model.Product;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiParam;
+import io.swagger.service.OrderService;
 import reactor.core.publisher.Mono;
 
 import org.slf4j.Logger;
@@ -58,6 +59,9 @@ public class StoreApiController implements StoreApi {
 
 	@Autowired
 	private StoreApiCache storeApiCache;
+
+	@Autowired
+	private OrderService orderService;
 
 	@Override
 	public StoreApiCache getBeanToBeAutowired() {
@@ -180,6 +184,7 @@ public class StoreApiController implements StoreApi {
 
 			try {
 				Order order = this.storeApiCache.getOrder(body.getId());
+				orderService.save(order);
 				String orderJSON = new ObjectMapper().writeValueAsString(order);
 
 				ApiUtil.setResponse(request, "application/json", orderJSON);
@@ -246,6 +251,7 @@ public class StoreApiController implements StoreApi {
 
 			try {
 				ApiUtil.setResponse(request, "application/json", new ObjectMapper().writeValueAsString(order));
+				orderService.save(order);
 				return new ResponseEntity<>(HttpStatus.OK);
 			} catch (IOException e) {
 				log.error("Couldn't serialize response for content type application/json", e);

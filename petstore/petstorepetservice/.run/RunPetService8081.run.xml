@@ -2,7 +2,10 @@
   <configuration default="false" name="RunPetService8081" type="Application" factoryName="Application">
     <option name="ALTERNATIVE_JRE_PATH" value="zulu-17" />
     <envs>
+      <env name="PET_DB_URI" value="jdbc:postgresql://tsv-postgesql.postgres.database.azure.com:5432/petstorepetservice_db" />
+      <env name="PET_DB_USERNAME" value="postgres" />
       <env name="PETSTOREPETSERVICE_SERVER_PORT" value="8081" />
+      <env name="PET_DB_PASSWORD" value="22tsv81SQL" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="io.swagger.Swagger2SpringBoot" />
     <module name="petstorepetservice" />
