@@ -14,9 +14,9 @@ spring:
       matching-strategy: ant_path_matcher
 
   datasource:
-    url: ${PRODUCT_DB_URI:jdbc:postgresql://tsv-postgesql.postgres.database.azure.com:5432/petstoreproductservice_db}
-    username: ${PRODUCT_DB_USERNAME:postgres}
-    password: ${PRODUCT_DB_PASSWORD:22tsv81SQL}
+    url: ${PRODUCT_DB_URI}
+    username: ${PRODUCT_DB_USERNAME}
+    password: ${PRODUCT_DB_PASSWORD}
 
   jpa:
     hibernate:

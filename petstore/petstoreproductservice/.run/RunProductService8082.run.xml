@@ -3,7 +3,7 @@
     <option name="ALTERNATIVE_JRE_PATH" value="zulu-17" />
     <envs>
       <env name="PETSTOREPRODUCTSERVICE_SERVER_PORT" value="8082" />
-      <env name="PRODUCT_DB_PASSWORD" value="22tsv81SQL" />
+      <env name="PRODUCT_DB_PASSWORD" value="" />
       <env name="PRODUCT_DB_URI" value="jdbc:postgresql://tsv-postgesql.postgres.database.azure.com:5432/petstoreproductservice_db" />
       <env name="PRODUCT_DB_USERNAME" value="postgres" />
     </envs>
