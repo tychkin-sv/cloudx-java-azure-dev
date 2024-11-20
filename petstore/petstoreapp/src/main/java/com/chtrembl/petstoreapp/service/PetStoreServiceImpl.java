@@ -7,14 +7,12 @@ package com.chtrembl.petstoreapp.service;
 import com.chtrembl.petstoreapp.model.Category;
 import com.chtrembl.petstoreapp.model.ContainerEnvironment;
 import com.chtrembl.petstoreapp.model.Order;
-import com.chtrembl.petstoreapp.model.OrderReservationRequest;
 import com.chtrembl.petstoreapp.model.Pet;
 import com.chtrembl.petstoreapp.model.Product;
 import com.chtrembl.petstoreapp.model.Tag;
 import com.chtrembl.petstoreapp.model.User;
 import com.chtrembl.petstoreapp.model.WebRequest;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -138,6 +136,15 @@ public class PetStoreServiceImpl implements PetStoreService {
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<List<Product>>() {
                     }).block();
+
+            logger.info("Product from service" + products);
+
+
+            // use this for look up on details page, intentionally avoiding spring cache to
+            // ensure service calls are made each for each browser session
+            // to show Telemetry with APIM requests (normally this would be cached in a real
+            // world production scenario)
+            this.sessionUser.setProducts(products);
 
 
             if (Objects.nonNull(products)) {

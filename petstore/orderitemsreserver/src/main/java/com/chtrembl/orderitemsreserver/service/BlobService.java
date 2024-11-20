@@ -7,27 +7,31 @@ import com.azure.storage.blob.models.BlobHttpHeaders;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Logger;
 
 public class BlobService {
 
+    private final String BLOB_CONNECTION_STRING =
+            System.getenv("BLOB_CONNECTION_STRING") != null ? System.getenv("BLOB_CONNECTION_STRING") :
+                    "not set";
+
     private final String blobConnectionString;
 
-    public BlobService(String blobConnectionString) {
-        this.blobConnectionString = blobConnectionString;
+    public BlobService() {
+        this.blobConnectionString = BLOB_CONNECTION_STRING;
     }
 
-    public void createFileInBlobStorage(String fileNamePrefix, String fileContent) {
-        // implementation
+    public void createOrReplaceFileInBlobStorage(String fileNamePrefix, String fileContent, Logger logger) {
+
+        logger.info("File prefix : " + fileNamePrefix);
         BlobContainerClient blobContainerClient = createBlobContainerIfNotExist("orderitems");
         BlobClient client = blobContainerClient.getBlobClient(fileNamePrefix + "_products");
 
-        // Convert the file content to a binary data stream
+        logger.info("Will process content : " + fileContent);
         ByteArrayInputStream dataStream = new ByteArrayInputStream(fileContent.getBytes(StandardCharsets.UTF_8));
 
-        // Upload the stream to the blob, overwriting any existing blob with the same name
         client.upload(dataStream, fileContent.length(), true);
 
-        // Optionally, set the content type of the blob to 'text/plain' or any appropriate value
         BlobHttpHeaders headers = new BlobHttpHeaders();
         headers.setContentType("application/json");
         client.setHttpHeaders(headers);

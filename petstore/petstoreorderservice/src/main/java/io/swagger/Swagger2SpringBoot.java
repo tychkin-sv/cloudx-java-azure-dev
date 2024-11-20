@@ -3,8 +3,6 @@ package io.swagger;
 import com.azure.spring.data.cosmos.repository.config.EnableCosmosRepositories;
 import com.chtrembl.petstore.order.model.ContainerEnvironment;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
@@ -21,9 +19,12 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableCaching
 @EnableSwagger2
 @EnableCosmosRepositories
-@ComponentScan(basePackages = {"io.swagger", "com.chtrembl.petstore.order.api", "io.swagger.configuration"})
+@ComponentScan(basePackages = {"io.swagger",
+        "com.chtrembl.petstore.order.api",
+        "io.swagger.configuration",
+        "io.swagger.processor"})
 public class Swagger2SpringBoot implements CommandLineRunner {
-    static final Logger log = LoggerFactory.getLogger(Swagger2SpringBoot.class);
+
 
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
@@ -46,7 +47,7 @@ public class Swagger2SpringBoot implements CommandLineRunner {
         new SpringApplication(Swagger2SpringBoot.class).run(args);
     }
 
-    class ExitException extends RuntimeException implements ExitCodeGenerator {
+    static class ExitException extends RuntimeException implements ExitCodeGenerator {
         private static final long serialVersionUID = 1L;
 
         @Override
