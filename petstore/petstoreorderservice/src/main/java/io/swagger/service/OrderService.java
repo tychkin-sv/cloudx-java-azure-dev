@@ -4,10 +4,13 @@ import com.chtrembl.petstore.order.model.Order;
 
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 import io.swagger.repository.OrderRepository;
 
 @Service
 public class OrderService {
+
     private final OrderRepository orderRepository;
 
     public OrderService(OrderRepository orderRepository) {
@@ -19,7 +22,8 @@ public class OrderService {
     }
 
     public Order get(String orderId) {
-        return orderRepository.findById(orderId)
-            .orElse(new Order());
+        Optional<Order> order = Optional.of(orderRepository.findById(orderId)
+                .orElse(new Order()));
+        return order.get();
     }
 }
